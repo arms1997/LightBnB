@@ -1,14 +1,14 @@
 const properties = require('./json/properties.json');
 const users = require('./json/users.json');
-const { Pool } = require('pg');
+const db = require('./db/index');
 
-const pool = new Pool({
-  user: 'vagrant',
-  password: 'Vagrant1!',
-  host: 'localhost',
-  port: 5432,
-  database: 'lightbnb'
-});
+// const pool = new Pool({
+//   user: 'vagrant',
+//   password: 'Vagrant1!',
+//   host: 'localhost',
+//   port: 5432,
+//   database: 'lightbnb'
+// });
 
 /// Users
 
@@ -33,7 +33,7 @@ const getUserWithEmail = function (email) {
     SELECT * FROM users 
     WHERE email = $1;
   `
-  return pool.query(queryString, [email])
+  return db.query(queryString, [email])
     .then(res => res.rows[0])
     .catch(err => console.error(err.stack))
 
@@ -52,7 +52,7 @@ const getUserWithId = function (id) {
     SELECT * FROM users 
     WHERE id = $1;
   `
-  return pool.query(queryString, [id])
+  return db.query(queryString, [id])
     .then(res => res.rows[0])
     .catch(err => console.error(err.stack))
 }
@@ -75,7 +75,7 @@ const addUser = function (user) {
   RETURNING *;
   `
 
-  return pool.query(queryString, [user.name, user.email, user.password])
+  return db.query(queryString, [user.name, user.email, user.password])
     .then(res => res.rows[0])
     .catch(err => console.error(err.stack))
 
@@ -101,7 +101,7 @@ const getAllReservations = function (guest_id, limit = 10) {
     LIMIT $2;
   `;
 
-  return pool.query(queryString, [guest_id, limit])
+  return db.query(queryString, [guest_id, limit])
     .then(res => res.rows)
     .catch(err => console.error(err.stack))
 }
@@ -130,7 +130,7 @@ const getAllProperties = function (options, limit = 10) {
     WHERE TRUE `
   if (options.owner_id) {
     queryParams.push(options.owner_id);
-    queryString += `WHERE properties.owner_id = $${queryParams.length} `;
+    queryString += `AND properties.owner_id = $${queryParams.length} `;
   }
 
   if (options.city) {
@@ -166,7 +166,7 @@ const getAllProperties = function (options, limit = 10) {
     `;
 
   console.log(queryString, queryParams)
-  return pool.query(queryString, queryParams)
+  return db.query(queryString, queryParams)
     .then(res => res.rows)
     .catch(err => console.error(err.stack))
 }
@@ -203,7 +203,7 @@ const addProperty = function (property) {
   RETURNING *;
   `
 
-  return pool.query(queryString, Object.values(property))
+  return db.query(queryString, Object.values(property))
     .then(res => res.rows[0])
     .catch(err => console.error(err.stack))
 }
