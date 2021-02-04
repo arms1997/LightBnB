@@ -1,7 +1,6 @@
 const properties = require('./json/properties.json');
 const users = require('./json/users.json');
-const { Pool, Query } = require('pg');
-const { query } = require('express');
+const { Pool } = require('pg');
 
 const pool = new Pool({
   user: 'vagrant',
@@ -184,24 +183,23 @@ const addProperty = function (property) {
   // property.id = propertyId;
   // properties[propertyId] = property;
   // return Promise.resolve(property);
-  console.log(Object.values(property))
   const queryString = `
   INSERT INTO properties (
-    owner_id,
-    title, 
-    description,
+    title,
+    description, 
+    number_of_bedrooms,
+    number_of_bathrooms,
+    parking_spaces,
+    cost_per_night,
     thumbnail_photo_url,
     cover_photo_url,
-    cost_per_night,
-    parking_spaces,
-    number_of_bathrooms,
-    number_of_bedrooms,
+    street,
     country,
-    street, 
-    city,
+    city, 
     province,
-    post_code) 
-  VALUES ($14, $1, $2, $7, $8, $6, $5, $4, $3, $10, $9, $11, $12, $13) 
+    post_code,
+    owner_id) 
+  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) 
   RETURNING *;
   `
 
